@@ -58,3 +58,6 @@ redis_data/
 
 # Docker
 .docker/
+
+# Turbo
+.turbo/
