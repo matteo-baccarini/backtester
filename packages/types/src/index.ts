@@ -60,14 +60,103 @@ export interface EquityPoint {
 // Trading Types
 export interface Order {
   id: string;
+  client_order_id: string;
+  created_at: string;
+  updated_at: string;
+  submitted_at: string;
+  filled_at?: string;
+  expired_at?: string;
+  canceled_at?: string;
+  failed_at?: string;
+  replaced_at?: string;
+  replaced_by?: string;
+  replaces?: string;
+  asset_id: string;
   symbol: string;
+  asset_class: string;
+  notional?: string;
+  qty?: string;
+  filled_qty: string;
+  filled_avg_price?: string;
+  order_class: "simple" | "bracket" | "oco" | "oto";
+  order_type: "market" | "limit" | "stop" | "stop_limit" | "trailing_stop";
+  type: "market" | "limit" | "stop" | "stop_limit" | "trailing_stop";
   side: "buy" | "sell";
-  quantity: number;
-  type: "market" | "limit" | "stop";
-  price?: number;
-  status: "pending" | "filled" | "cancelled" | "rejected";
-  createdAt: Date;
-  filledAt?: Date;
+  time_in_force: "day" | "gtc" | "opg" | "cls" | "ioc" | "fok";
+  limit_price?: string;
+  stop_price?: string;
+  trail_price?: string;
+  trail_percent?: string;
+  hwm?: string;
+  extended_hours: boolean;
+  legs?: OrderLeg[];
+  status:
+    | "new"
+    | "partially_filled"
+    | "filled"
+    | "done_for_day"
+    | "canceled"
+    | "expired"
+    | "replaced"
+    | "pending_cancel"
+    | "pending_replace"
+    | "accepted"
+    | "pending_new"
+    | "accepted_for_bidding"
+    | "stopped"
+    | "rejected"
+    | "suspended"
+    | "calculated";
+}
+
+export interface OrderLeg {
+  id: string;
+  client_order_id: string;
+  created_at: string;
+  updated_at: string;
+  submitted_at: string;
+  filled_at?: string;
+  expired_at?: string;
+  canceled_at?: string;
+  failed_at?: string;
+  replaced_at?: string;
+  replaced_by?: string;
+  replaces?: string;
+  asset_id: string;
+  symbol: string;
+  asset_class: string;
+  notional?: string;
+  qty?: string;
+  filled_qty: string;
+  filled_avg_price?: string;
+  order_class: "simple" | "bracket" | "oco" | "oto";
+  order_type: "market" | "limit" | "stop" | "stop_limit" | "trailing_stop";
+  type: "market" | "limit" | "stop" | "stop_limit" | "trailing_stop";
+  side: "buy" | "sell";
+  time_in_force: "day" | "gtc" | "opg" | "cls" | "ioc" | "fok";
+  limit_price?: string;
+  stop_price?: string;
+  trail_price?: string;
+  trail_percent?: string;
+  hwm?: string;
+  extended_hours: boolean;
+  status:
+    | "new"
+    | "partially_filled"
+    | "filled"
+    | "done_for_day"
+    | "canceled"
+    | "expired"
+    | "replaced"
+    | "pending_cancel"
+    | "pending_replace"
+    | "accepted"
+    | "pending_new"
+    | "accepted_for_bidding"
+    | "stopped"
+    | "rejected"
+    | "suspended"
+    | "calculated";
 }
 
 export interface Position {
