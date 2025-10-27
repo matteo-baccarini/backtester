@@ -6,3 +6,8 @@ export interface OHLCV {
   volume: number;
   timestamp: Date;
 }
+
+export interface IndicatorResult {
+  value: number;
+  timestamp: Date;
+}
