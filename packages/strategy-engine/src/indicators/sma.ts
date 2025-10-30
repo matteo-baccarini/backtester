@@ -45,6 +45,7 @@ export class SMA {
     if (this.prices.length >= this.period - 1) {
       if (this.prices.length === this.period - 1) {
         this.prices.push(price.close);
+        return null; // not enough data to calculate SMA yet
       }
       this.prices.shift(); // remove oldest price
       this.prices.push(price.close); // add new price
