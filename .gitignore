@@ -61,3 +61,12 @@ redis_data/
 
 # Turbo
 .turbo/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+.terraform.lock.hcl
