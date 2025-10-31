@@ -1,64 +1,70 @@
 import { IndicatorResult, OHLCV } from "./types";
 
 export class SMA {
-
   private period: number;
-  private prices: number[] = [];
-
-  private hasEnoughData(data : OHLCV[] | number[]): boolean {
-    return data.length >= this.period;
-  }
+  private prices: number[] = []; // Store only close prices
 
   constructor(period: number = 20) {
     this.period = period;
   }
 
-  calculate(data: OHLCV[]): IndicatorResult[] { // calculate SMA for given OHLCV data
-    if (!this.hasEnoughData(data)) {
-      return []; // if not enough data, return empty array
-    }
-    
-    const results : IndicatorResult[] = [];
+  private hasEnoughData(): boolean {
+    return this.prices.length >= this.period;
+  }
 
-    for (let i = 0; i <= (data.length - this.period); i++){
-      const periodSlice = data.slice(i, i + this.period); // access groups of 'period' length
-      const sum = periodSlice.reduce((acc, cur) => acc + cur.close, 0); // sum the close prices
+  // Batch calculation for an entire dataset
+  calculate(data: OHLCV[]): IndicatorResult[] {
+    if (data.length < this.period) {
+      return [];
+    }
+
+    const results: IndicatorResult[] = [];
+
+    for (let i = 0; i <= data.length - this.period; i++) {
+      let sum = 0;
+      for (let j = i; j < i + this.period; j++) {
+        sum += data[j].close;
+      }
       const sma = sum / this.period;
-      results.push({value : sma, timestamp : periodSlice[periodSlice.length - 1].timestamp}); // push the result with the timestamp of the last entry in the period
+
+      results.push({
+        value: sma,
+        timestamp: data[i + this.period - 1].timestamp,
+      });
     }
 
     return results;
   }
 
+  // Return current SMA for the stored prices
   getValue(): number | null {
-    if (!this.hasEnoughData(this.prices)) {
+    if (!this.hasEnoughData()) {
       return null;
     }
 
     const sum = this.prices.reduce((acc, cur) => acc + cur, 0);
-    const sma = sum/this.period;
-    return sma;
-
+    return sum / this.period;
   }
 
+  // Incrementally update SMA with a new price
   update(price: OHLCV): number | null {
-    if (this.prices.length >= this.period - 1) {
-      if (this.prices.length === this.period - 1) {
-        this.prices.push(price.close);
-        return null; // not enough data to calculate SMA yet
-      }
-      this.prices.shift(); // remove oldest price
-      this.prices.push(price.close); // add new price
-      
-      const sum = this.prices.reduce((acc, cur) => acc + cur, 0);
-      const sma = sum / this.period;
-      return sma;
-    }else{
-      this.prices.push(price.close);
-      return null; // not enough data to calculate SMA yet
+    this.prices.push(price.close); // Only store close price
+
+    // Maintain rolling window
+    if (this.prices.length > this.period) {
+      this.prices.shift();
     }
+
+    // Only compute once enough data exists
+    if (!this.hasEnoughData()) {
+      return null;
+    }
+
+    const sum = this.prices.reduce((acc, cur) => acc + cur, 0);
+    return sum / this.period;
   }
 
+  // Reset internal state
   reset(): void {
     this.prices = [];
   }
