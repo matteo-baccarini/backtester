@@ -1,6 +1,8 @@
+import { OHLCV } from "./types";
+
 export class RSI {
   constructor(period: number = 14) {}
-  calculate(data: any[]): any[] {
+  calculate(data: OHLCV[]): any[] {
     return [];
   }
   getValue(): number | null {
