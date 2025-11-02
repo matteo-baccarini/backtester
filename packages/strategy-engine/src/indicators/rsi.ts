@@ -27,19 +27,29 @@ export class RSI {
     return { avgGain : gains/this.period , avgLosses : losses/this.period };
   }
   
-  // calculate(data: OHLCV[]): IndicatorResult[] {
-  //   if (!this.hasEnoughData(data)) {
-  //     return [];
-  //   }
+  calculate(data: OHLCV[]): IndicatorResult[] {
+    if (!this.hasEnoughData(data)) {
+      return [];
+    }
 
-  //   const results : IndicatorResult[] = [];
-  //   const {avgGain, avgLosses} = this.calculateGainLoss(data.slice(0, this.period + 1));
+    const results : IndicatorResult[] = [];
 
-  //   let currentAvgGain = avgGain;
-  //   let currentAvgLosses = avgLosses;
+    for (let i = this.period; i < data.length; i++){
+      const slice = data.slice(i - this.period, i + 1);
 
+      const {avgGain, avgLosses} = this.calculateGainLoss(slice);
 
-  // }
+      const rs = avgLosses === 0 ? 100 : avgGain / avgLosses;
+      const RSI = 100 - (100 / (1 + rs));
+
+      results.push({
+        value: RSI,
+        timestamp: data[i].timestamp
+      });
+    }
+
+    return results;    
+  }
 
   getValue(): number | null {
     return null;
