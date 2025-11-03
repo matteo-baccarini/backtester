@@ -8,6 +8,12 @@ export interface OHLCV {
 }
 
 export interface IndicatorResult {
-  value: number;
+  value: number | null;
   timestamp: Date;
+}
+
+export interface MACDResult {
+  macd: IndicatorResult[];
+  signal: IndicatorResult[];
+  histogram: IndicatorResult[];
 }

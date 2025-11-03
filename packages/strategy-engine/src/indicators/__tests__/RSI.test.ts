@@ -171,9 +171,11 @@ describe('RSI (Relative Strength Index)', () => {
       const calculateResults = rsiCalculate.calculate(data);
       
       expect(updateResults.length).toBe(calculateResults.length);
-      updateResults.forEach((value, index) => {
-        expect(value).toBeCloseTo(calculateResults[index].value, 1);
-      });
+        updateResults.forEach((value, index) => {
+            const calcValue = calculateResults[index].value;
+            expect(calcValue).not.toBeNull(); // Check it's not null first
+            expect(value).toBeCloseTo(calcValue!, 1); // Then use non-null assertion
+        });
     });
 
     it('should handle RSI = 100 case (only gains)', () => {

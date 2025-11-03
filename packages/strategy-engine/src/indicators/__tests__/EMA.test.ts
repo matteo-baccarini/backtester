@@ -335,8 +335,15 @@ describe('EMA (Exponential Moving Average)', () => {
       const results = ema.calculate(data);
       
       expect(results).toHaveLength(951); // 1000 - 50 + 1
-      expect(results[0].value).toBeGreaterThan(100);
-      expect(results[results.length - 1].value).toBeGreaterThan(results[0].value);
+
+      const firstValue = results[0].value;
+      const lastValue = results[results.length - 1].value;
+
+
+      expect(firstValue).not.toBeNull();
+      expect(lastValue).not.toBeNull();
+      expect(firstValue).toBeGreaterThan(100);
+      expect(lastValue!).toBeGreaterThan(firstValue!);
     });
 
     it('should be more responsive than SMA to trend changes', () => {
