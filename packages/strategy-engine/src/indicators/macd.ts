@@ -23,7 +23,20 @@ export class MACD {
     this.signalEMA = new EMA(this.signalPeriod);
   }
 
+  private hasEnoughData(data: OHLCV[]): boolean {
+    return data.length >= this.slowPeriod && data.length >= this.fastPeriod && data.length >= this.signalPeriod;
+  }
+
 calculate(data: OHLCV[]): MACDResult {
+
+  if (!this.hasEnoughData(data)) {
+    return {
+      macd : [],
+      signal : [],
+      histogram :  [],
+    }
+  }
+  
   // Step 1: Calculate the fast and slow EMAs from the price data
   const fastEMAResults = this.fastEMA.calculate(data);
   const slowEMAResults = this.slowEMA.calculate(data);
@@ -111,7 +124,7 @@ calculate(data: OHLCV[]): MACDResult {
 
 
   update(price: number): any {
-    return { macd: null, signal: null, histogram: null };
+    ;
   }
 
   reset(): void {}
