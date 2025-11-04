@@ -1,4 +1,4 @@
-import { IndicatorResult, OHLCV, MACDResult } from './types';
+import { IndicatorResult, OHLCV, MACDResult, MACDValue } from './types';
 import { EMA } from './ema';
 
 export class MACD {
@@ -123,7 +123,7 @@ calculate(data: OHLCV[]): MACDResult {
 
 
 
-  update(price: OHLCV): any {
+  update(price: OHLCV): MACDValue {
     ///add value to all EMAs
     const fastValue =this.fastEMA.update(price);
     const slowValue = this.slowEMA.update(price);

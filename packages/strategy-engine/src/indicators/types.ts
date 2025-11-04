@@ -17,3 +17,9 @@ export interface MACDResult {
   signal: IndicatorResult[];
   histogram: IndicatorResult[];
 }
+
+export interface MACDValue {
+  macd: number | null;
+  signal : number | null;
+  histogram : number | null;
+}
