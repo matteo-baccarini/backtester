@@ -36,7 +36,7 @@ calculate(data: OHLCV[]): MACDResult {
       histogram :  [],
     }
   }
-  
+
   // Step 1: Calculate the fast and slow EMAs from the price data
   const fastEMAResults = this.fastEMA.calculate(data);
   const slowEMAResults = this.slowEMA.calculate(data);
@@ -123,8 +123,44 @@ calculate(data: OHLCV[]): MACDResult {
 
 
 
-  update(price: number): any {
-    ;
+  update(price: OHLCV): any {
+    ///add value to all EMAs
+    const fastValue =this.fastEMA.update(price);
+    const slowValue = this.slowEMA.update(price);
+
+    let macdValue : number | null = null;
+
+    if (fastValue !== null || slowValue !== null){
+      macdValue = fastValue! - slowValue!;
+    }
+
+    let signalValue : number | null = null;
+
+    if (macdValue !== null){
+      
+      const signalPrice : OHLCV = {
+        open : macdValue,
+        high : macdValue,
+        low : macdValue,
+        close : macdValue,
+        volume : 0,
+        timestamp : price.timestamp,
+      }
+
+      signalValue = this.signalEMA.update(signalPrice);
+    }
+
+    let histogramValue : number | null = null;
+
+    if (macdValue !== null && signalValue !== null){
+      histogramValue = macdValue - signalValue;
+    }
+
+    return {
+      macd : macdValue,
+      signal : signalValue,
+      histogram : histogramValue,
+    };
   }
 
   reset(): void {}
