@@ -163,5 +163,21 @@ calculate(data: OHLCV[]): MACDResult {
     };
   }
 
-  reset(): void {}
+  getValue(): MACDValue {
+    const macd = this.fastEMA.getValue() !== null && this.slowEMA.getValue() !== null
+      ? this.fastEMA.getValue()! - this.slowEMA.getValue()!
+      : null;
+
+      const signal = this.signalEMA.getValue();
+
+      const histogram = macd !== null && signal !== null ? macd - signal : null;
+
+      return {macd, signal, histogram};
+  }
+
+  reset(): void {
+    this.fastEMA.reset();
+    this.slowEMA.reset();
+    this.signalEMA.reset();
+  }
 }
