@@ -93,25 +93,39 @@ calculate(data: OHLCV[]): MACDResult {
 
   // Step 4: Calculate histogram (MACD line - signal line)
   // The signal line also needs time to warm up (9 periods), so it will be shorter than MACD line
-  const histogram: IndicatorResult[] = macdLine.map((macdRes, i) => {
-    // Calculate the offset to align signal line with MACD line
-    // Signal line is shorter, so early MACD values won't have corresponding signal values
-    const signalIndex = i - (macdLine.length - signalLine.length);
+
+  const histogram : IndicatorResult[] = [];
+
+  const startIndex = macdLine.length - signalLine.length;
+
+  for (let i = 0; i < signalLine.length; i++){
+    const macdIndex = startIndex + i;
+    const histogramValue = macdLine[macdIndex].value! - signalLine[i].value!;
+
+    histogram.push({
+      value : histogramValue,
+      timestamp : signalLine[i].timestamp,
+    })
+  }
+  // const histogram: IndicatorResult[] = macdLine.map((macdRes, i) => {
+  //   // Calculate the offset to align signal line with MACD line
+  //   // Signal line is shorter, so early MACD values won't have corresponding signal values
+  //   const signalIndex = i - (macdLine.length - signalLine.length);
     
-    // If we have a valid signal value (signalIndex >= 0), calculate histogram
-    // Otherwise, return null for the warm-up period
-    if (signalIndex >= 0 && macdRes.value !== null && signalLine[signalIndex].value !== null) {
-      return {
-        value: macdRes.value - signalLine[signalIndex].value,
-        timestamp: macdRes.timestamp
-      };
-    } else {
-      return {
-        value: null,
-        timestamp: macdRes.timestamp
-      };
-    }
-  });
+  //   // If we have a valid signal value (signalIndex >= 0), calculate histogram
+  //   // Otherwise, return null for the warm-up period
+  //   if (signalIndex >= 0 && macdRes.value !== null && signalLine[signalIndex].value !== null) {
+  //     return {
+  //       value: macdRes.value - signalLine[signalIndex].value,
+  //       timestamp: macdRes.timestamp
+  //     };
+  //   }else{
+  //     return {
+  //       value: null,
+  //       timestamp: macdRes.timestamp
+  //     }
+  //   }
+  // });
 
   // Return all three components of MACD
   return {
@@ -130,7 +144,7 @@ calculate(data: OHLCV[]): MACDResult {
 
     let macdValue : number | null = null;
 
-    if (fastValue !== null || slowValue !== null){
+    if (fastValue !== null && slowValue !== null){
       macdValue = fastValue! - slowValue!;
     }
 

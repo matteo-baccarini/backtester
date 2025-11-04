@@ -74,7 +74,7 @@ export class EMA {
     }
 
     // After initialization, just apply EMA formula
-    // No need to maintain a sliding window - that's the beauty of EMA!
+    // No need to maintain a sliding window
     const closePrice = price.close;
     this.previousEMA = (closePrice - this.previousEMA!) * this.multiplier + this.previousEMA!;
     return this.previousEMA;
