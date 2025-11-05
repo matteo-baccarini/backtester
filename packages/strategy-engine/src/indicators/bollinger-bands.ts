@@ -51,10 +51,20 @@ export class BollingerBands {
     if (!this.hasEnoughData(data)){
       return { upper: [], middle: [], lower: [] };
     }
-    const middleBand = this.smaIndicator.calculate(data);
 
-    return { upper: [], middle: [], lower: [] };
+    const smaResults = this.smaIndicator.calculate(data);
+    const standardDeviations = this.calculateStandardDeviation(data);
+
+    const upperBand : IndicatorResult[] = [];
+    const lowerBand : IndicatorResult[] = [];
+
+    for (let i = 0; i < standardDeviations.length; i++){
+      upperBand.push({ value : smaResults[i].value! + this.multiplier * standardDeviations[i] , timestamp : smaResults[i].timestamp });
+      lowerBand.push({ value : smaResults[i].value! - this.multiplier * standardDeviations[i] , timestamp : smaResults[i].timestamp });
+    }
+    return { upper: upperBand, middle: smaResults, lower: lowerBand };
   }
+  
   update(price: number): BollingerBandsResult {
     return { upper: [], middle: [], lower: [] };
   }
