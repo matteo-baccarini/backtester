@@ -135,8 +135,9 @@ describe('RSI (Relative Strength Index)', () => {
       rsi.update(data[1]);
       rsi.update(data[2]);
       const result = rsi.update(data[3]);
-      
-      expect(result).toBeCloseTo(83.33, 1);
+      expect(result).not.toBeNull();
+      if (result === null) return;
+      expect(result.value).toBeCloseTo(83.33, 1);
     });
 
     it('should update RSI correctly with new data using Wilder smoothing', () => {
@@ -148,9 +149,11 @@ describe('RSI (Relative Strength Index)', () => {
       rsi.update(data[2]);
       const rsi1 = rsi.update(data[3]);
       const rsi2 = rsi.update(data[4]);
-      
-      expect(rsi1).toBeCloseTo(83.33, 1);
-      expect(rsi2).toBeCloseTo(66.67, 1);
+      expect(rsi1).not.toBeNull();
+      expect(rsi2).not.toBeNull();
+      if (rsi1 === null || rsi2 === null) return;
+      expect(rsi1.value).toBeCloseTo(83.33, 1);
+      expect(rsi2.value).toBeCloseTo(66.67, 1);
     });
 
     it('should match calculate() results when called sequentially', () => {
@@ -218,7 +221,10 @@ describe('RSI (Relative Strength Index)', () => {
       rsi.update(data[3]);
       const lastUpdate = rsi.update(data[4]);
       
-      expect(rsi.getValue()).toBe(lastUpdate);
+      expect(lastUpdate).not.toBeNull();
+      if (lastUpdate) {
+        expect(rsi.getValue()).toBe(lastUpdate.value);
+      }
     });
 
     it('should return same value when called multiple times', () => {

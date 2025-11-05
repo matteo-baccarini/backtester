@@ -166,8 +166,10 @@ describe('EMA (Exponential Moving Average)', () => {
       ema.update(createOHLCV(20, new Date()));
       const result = ema.update(createOHLCV(30, new Date()));
       
+      expect(result).not.toBeNull();
+      if (result === null) return;
       // Should return SMA = (10+20+30)/3 = 20
-      expect(result).toBe(20);
+      expect(result.value).toBe(20);
     });
 
     it('should calculate EMA after initialization', () => {
@@ -179,8 +181,10 @@ describe('EMA (Exponential Moving Average)', () => {
       
       const result = ema.update(createOHLCV(40, new Date()));
       
+      expect(result).not.toBeNull();
+      if (result === null) return;
       // EMA = (40 - 20) * 0.5 + 20 = 30
-      expect(result).toBeCloseTo(30, 5);
+      expect(result.value).toBeCloseTo(30, 5);
     });
 
     it('should maintain sliding window correctly', () => {
@@ -193,9 +197,15 @@ describe('EMA (Exponential Moving Average)', () => {
       const ema1 = ema.update(createOHLCV(40, new Date()));
       const ema2 = ema.update(createOHLCV(50, new Date()));
       
-      expect(ema1).toBeCloseTo(30, 5);
+      expect(ema1).not.toBeNull();
+      expect(ema2).not.toBeNull();
+
+      if (ema1 === null || ema2 === null) return;
+      // EMA1 = (40 - 20) * 0.5 + 20 = 30
+
+      expect(ema1.value).toBeCloseTo(30, 5);
       // EMA2 = (50 - 30) * 0.5 + 30 = 40
-      expect(ema2).toBeCloseTo(40, 5);
+      expect(ema2.value).toBeCloseTo(40, 5);
     });
 
     it('should converge to price level when price stabilizes', () => {
@@ -220,9 +230,20 @@ describe('EMA (Exponential Moving Average)', () => {
     it('should work with period of 1', () => {
       const ema = new EMA(1);
       
-      expect(ema.update(createOHLCV(100, new Date()))).toBe(100);
-      expect(ema.update(createOHLCV(200, new Date()))).toBe(200);
-      expect(ema.update(createOHLCV(150, new Date()))).toBe(150);
+      const firstUpdate = ema.update(createOHLCV(100, new Date()));
+      expect(firstUpdate).not.toBeNull();
+      if (firstUpdate === null) return;
+      expect(firstUpdate.value).toBe(100);
+
+      const secondUpdate = ema.update(createOHLCV(200, new Date()));
+      expect(secondUpdate).not.toBeNull();
+      if (secondUpdate === null) return;
+      expect(secondUpdate.value).toBe(200);
+      
+      const thirdUpdate = ema.update(createOHLCV(150, new Date()));
+      expect(thirdUpdate).not.toBeNull();
+      if (thirdUpdate === null) return;
+      expect(thirdUpdate.value).toBe(150);
     });
   });
 
@@ -260,8 +281,9 @@ describe('EMA (Exponential Moving Average)', () => {
       
       const updateResult = ema.update(createOHLCV(40, new Date()));
       const getValueResult = ema.getValue();
-      
-      expect(getValueResult).toBe(updateResult);
+      expect(getValueResult).not.toBeNull();
+      if (getValueResult === null || updateResult === null) return;
+      expect(getValueResult).toBe(updateResult.value);
     });
 
     it('should return null after calculate() is used', () => {
@@ -302,9 +324,14 @@ describe('EMA (Exponential Moving Average)', () => {
       ema.update(createOHLCV(200, new Date()));
       
       ema.reset();
-      
-      expect(ema.update(createOHLCV(50, new Date()))).toBeNull();
-      expect(ema.update(createOHLCV(100, new Date()))).toBe(75); // (50+100)/2
+
+      const firstUpdate = ema.update(createOHLCV(50, new Date()));
+      expect(firstUpdate).toBeNull();
+
+      const secondUpdate = ema.update(createOHLCV(100, new Date()));
+      expect(secondUpdate).not.toBeNull();
+      if(secondUpdate === null) return;
+      expect(secondUpdate.value).toBe(75); // (50+100)/2
     });
   });
 
@@ -361,10 +388,13 @@ describe('EMA (Exponential Moving Average)', () => {
       const ema1 = ema.update(createOHLCV(110, new Date()));
       const ema2 = ema.update(createOHLCV(120, new Date()));
       
+      expect(ema2).not.toBeNull();
+
+      if (ema2 === null) return;
       // EMA should react faster than SMA would
       // SMA would be (100+100+100+110+120)/5 = 106
       // EMA should be higher
-      expect(ema2!).toBeGreaterThan(106);
+      expect(ema2.value).toBeGreaterThan(106);
     });
 
     it('should handle volatile prices', () => {
@@ -375,9 +405,11 @@ describe('EMA (Exponential Moving Average)', () => {
       ema.update(createOHLCV(100, new Date()));
       const result = ema.update(createOHLCV(200, new Date()));
       
+      expect(result).not.toBeNull();
+      if (result === null) return;
       // Should handle large swings
-      expect(result).toBeGreaterThan(100);
-      expect(result).toBeLessThan(200);
+      expect(result.value).toBeGreaterThan(100);
+      expect(result.value).toBeLessThan(200);
     });
   });
 

@@ -95,7 +95,10 @@ describe('SMA (Simple Moving Average)', () => {
       sma.update(createOHLCV(100, new Date()));
       sma.update(createOHLCV(200, new Date()));
       const result = sma.update(createOHLCV(300, new Date())); // should now calculate
-      expect(result).toBe(200); // (100 + 200 + 300) / 3
+
+      expect(result).not.toBeNull();
+      if (result === null) return;
+      expect(result.value).toBe(200); // (100 + 200 + 300) / 3
     });
 
     it('should maintain sliding window correctly', () => {
@@ -106,17 +109,30 @@ describe('SMA (Simple Moving Average)', () => {
       const sma1 = sma.update(createOHLCV(40, new Date()));
       const sma2 = sma.update(createOHLCV(50, new Date()));
       const sma3 = sma.update(createOHLCV(60, new Date()));
-      expect(sma1).toBe(30);
-      expect(sma2).toBe(40);
-      expect(sma3).toBe(50);
+      
+      expect(sma1).not.toBeNull();
+      expect(sma2).not.toBeNull();
+      expect(sma3).not.toBeNull();
+      if (sma1 === null || sma2 === null || sma3 === null) return;
+      expect(sma1.value).toBe(30);
+      expect(sma2.value).toBe(40);
+      expect(sma3.value).toBe(50);
     });
 
     it('should work correctly after multiple updates', () => {
       const sma = new SMA(2);
       sma.update(createOHLCV(100, new Date()));
       sma.update(createOHLCV(200, new Date()));
-      expect(sma.update(createOHLCV(300, new Date()))).toBe(250);
-      expect(sma.update(createOHLCV(400, new Date()))).toBe(350);
+
+      const firstSMA = sma.update(createOHLCV(300, new Date()));
+      expect(firstSMA).not.toBeNull();
+      if (firstSMA === null) return;
+      expect(firstSMA.value).toBe(250); // (200 + 300) / 2
+
+      const secondSMA = sma.update(createOHLCV(400, new Date()));
+      expect(secondSMA).not.toBeNull();
+      if (secondSMA === null) return;
+      expect(secondSMA.value).toBe(350); // (300 + 400) / 2
     });
   });
 
@@ -148,7 +164,9 @@ describe('SMA (Simple Moving Average)', () => {
       sma.update(createOHLCV(200, new Date()));
       sma.update(createOHLCV(300, new Date()));
       const updateResult = sma.update(createOHLCV(400, new Date()));
-      expect(sma.getValue()).toBe(updateResult);
+      expect(updateResult).not.toBeNull();
+      if (updateResult === null) return;
+      expect(sma.getValue()).toBe(updateResult.value);
     });
 
     it('should return null after calculate() is used', () => {
@@ -181,17 +199,37 @@ describe('SMA (Simple Moving Average)', () => {
       sma.update(createOHLCV(200, new Date()));
       sma.reset();
       expect(sma.update(createOHLCV(50, new Date()))).toBeNull();
-      expect(sma.update(createOHLCV(100, new Date()))).toBe(75); // FIXED: (50+100)/2
-      expect(sma.update(createOHLCV(150, new Date()))).toBe(125);
+
+      const secondUpdate = sma.update(createOHLCV(100, new Date()));
+      expect(secondUpdate).not.toBeNull();
+      if (secondUpdate === null) return;
+      expect(secondUpdate.value).toBe(75); // (50+100)/2
+
+      const thirdUpdate = sma.update(createOHLCV(150, new Date()));
+      expect(thirdUpdate).not.toBeNull();
+      if (thirdUpdate === null) return;
+      expect(thirdUpdate.value).toBe(125); // (100+150)/2
     });
   });
 
   describe('edge cases', () => {
     it('should handle period of 1', () => {
       const sma = new SMA(1);
-      expect(sma.update(createOHLCV(100, new Date()))).toBe(100);
-      expect(sma.update(createOHLCV(200, new Date()))).toBe(200);
-      expect(sma.update(createOHLCV(300, new Date()))).toBe(300);
+
+      const result1 = sma.update(createOHLCV(100, new Date()));
+      expect(result1).not.toBeNull();
+      if (result1 === null) return;
+      expect(result1.value).toBe(100);
+
+      const result2 = sma.update(createOHLCV(200, new Date()));
+      expect(result2).not.toBeNull();
+      if (result2 === null) return;
+      expect(result2.value).toBe(200);
+      
+      const result3 = sma.update(createOHLCV(300, new Date()));
+      expect(result3).not.toBeNull();
+      if (result3 === null) return;
+      expect(result3.value).toBe(300);
     });
 
     it('should handle large datasets', () => {
