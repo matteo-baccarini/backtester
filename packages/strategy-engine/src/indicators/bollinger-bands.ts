@@ -1,4 +1,4 @@
-import { OHLCV, IndicatorResult, BollingerBandsResult } from "./types";
+import { OHLCV, IndicatorResult, BollingerBandsResult, BollingerBandsValue } from "./types";
 import {SMA} from "./sma";
 
 
@@ -15,7 +15,7 @@ export class BollingerBands {
   }
 
   private hasEnoughData(data : OHLCV[]) : boolean {
-    return data.length > this.period;
+    return data.length >= this.period;
   }
 
   private calculateStandardDeviation(data: OHLCV[]): number[] {
@@ -66,7 +66,7 @@ export class BollingerBands {
     return { upper: upperBand, middle: smaResults, lower: lowerBand };
   }
 
-  update(price: OHLCV): BollingerBandsResult {
+  update(price: OHLCV): BollingerBandsValue {
     this.prices.push(price);
 
     // Maintain rolling window
@@ -76,7 +76,7 @@ export class BollingerBands {
 
     // Only compute once enough data exists
     if (!this.hasEnoughData(this.prices)) {
-      return { upper: [], middle: [], lower: [] };
+      return { upper : null, middle :null, lower : null };
     }
 
     const stdDev = this.calculateStandardDeviation(this.prices);
@@ -86,7 +86,7 @@ export class BollingerBands {
     
   // If middle is null, we can’t compute the bands yet
   if (!middle) {
-    return { upper: [], middle: [], lower: [] };
+    return { upper: null, middle: null, lower: null };
   }
 
 
@@ -94,9 +94,9 @@ export class BollingerBands {
   const lower = middle.value !== null ? middle.value - this.multiplier * stdDev[stdDev.length -1] : null;
 
   return {
-    upper: [{ value: upper, timestamp : price.timestamp }],
-    middle: [{ value: middle.value, timestamp : price.timestamp }],
-    lower: [{ value: lower, timestamp : price.timestamp }],
+    upper: upper,
+    middle: middle.value,
+    lower: lower,
   };
   }
 

@@ -29,3 +29,9 @@ export interface MACDValue {
   signal : number | null;
   histogram : number | null;
 }
+
+export interface BollingerBandsValue {
+  upper: number | null;
+  middle: number | null;
+  lower: number | null;
+}
