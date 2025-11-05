@@ -76,7 +76,7 @@ export class RSI {
     return results;
   }
 
-  update(data: OHLCV): number | null {
+  update(data: OHLCV): IndicatorResult | null {
     this.prices.push(data.close);
 
     if (this.prices.length < this.period + 1) {
@@ -98,7 +98,10 @@ export class RSI {
       this.avgLoss = losses / this.period;
       this.previousClose = data.close;
 
-      return this.calculateRSI(this.avgGain, this.avgLoss);
+      return {
+        value : this.calculateRSI(this.avgGain, this.avgLoss),
+        timestamp : data.timestamp
+      };
     }
 
     // Wilder smoothing
@@ -110,7 +113,10 @@ export class RSI {
     this.avgLoss = (this.avgLoss * (this.period - 1) + loss) / this.period;
     this.previousClose = data.close;
 
-    return this.calculateRSI(this.avgGain, this.avgLoss);
+    return {
+      value : this.calculateRSI(this.avgGain, this.avgLoss),
+      timestamp : data.timestamp
+    };
   }
 
   getValue(): number | null {

@@ -100,5 +100,8 @@ export class BollingerBands {
   };
   }
 
-  reset(): void {}
+  reset(): void {
+    this.prices = [];
+    this.smaIndicator.reset();
+  }
 }

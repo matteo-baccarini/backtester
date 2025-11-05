@@ -163,7 +163,7 @@ describe('RSI (Relative Strength Index)', () => {
       for (const candle of data) {
         const result = rsiUpdate.update(candle);
         if (result !== null) {
-          updateResults.push(result);
+          updateResults.push(result.value!);
         }
       }
       

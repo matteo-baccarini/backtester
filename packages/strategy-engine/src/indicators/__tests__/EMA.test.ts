@@ -1,5 +1,5 @@
 import { EMA } from '../ema';
-import { OHLCV } from '../types';
+import { OHLCV, IndicatorResult } from '../types';
 
 describe('EMA (Exponential Moving Average)', () => {
   
@@ -207,13 +207,14 @@ describe('EMA (Exponential Moving Average)', () => {
       ema.update(createOHLCV(100, new Date()));
       
       // Keep feeding same price
-      let result = 100;
+      let result: IndicatorResult | null = null;
       for (let i = 0; i < 10; i++) {
-        result = ema.update(createOHLCV(100, new Date()))!;
+        result = ema.update(createOHLCV(100, new Date()));
       }
       
       // Should stay at 100
-      expect(result).toBeCloseTo(100, 5);
+      expect(result).not.toBeNull();
+      expect(result!.value).toBeCloseTo(100, 5);
     });
 
     it('should work with period of 1', () => {
