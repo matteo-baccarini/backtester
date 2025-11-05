@@ -47,7 +47,7 @@ export class SMA {
   }
 
   // Incrementally update SMA with a new price
-  update(price: OHLCV): number | null {
+  update(price: OHLCV): IndicatorResult | null {
     this.prices.push(price.close); // Only store close price
 
     // Maintain rolling window
@@ -61,7 +61,10 @@ export class SMA {
     }
 
     const sum = this.prices.reduce((acc, cur) => acc + cur, 0);
-    return sum / this.period;
+    return {
+      value: sum / this.period,
+      timestamp: price.timestamp,
+    };
   }
 
   // Reset internal state

@@ -6,6 +6,7 @@ export class BollingerBands {
   private period : number;
   private multiplier : number;
   private smaIndicator : SMA;
+  prices : OHLCV[] = [];
 
   constructor(period: number = 20, multiplier: number = 2) {
     this.period = period;
@@ -64,9 +65,40 @@ export class BollingerBands {
     }
     return { upper: upperBand, middle: smaResults, lower: lowerBand };
   }
-  
-  update(price: number): BollingerBandsResult {
+
+  update(price: OHLCV): BollingerBandsResult {
+    this.prices.push(price);
+
+    // Maintain rolling window
+    if (this.prices.length > this.period + 1) {
+      this.prices.shift();
+    }
+
+    // Only compute once enough data exists
+    if (!this.hasEnoughData(this.prices)) {
+      return { upper: [], middle: [], lower: [] };
+    }
+
+    const stdDev = this.calculateStandardDeviation(this.prices);
+
+    const middle = this.smaIndicator.update(price);
+
+    
+  // If middle is null, we can’t compute the bands yet
+  if (!middle) {
     return { upper: [], middle: [], lower: [] };
   }
+
+
+  const upper = middle.value !== null ? middle.value + this.multiplier * stdDev[stdDev.length -1] : null;
+  const lower = middle.value !== null ? middle.value - this.multiplier * stdDev[stdDev.length -1] : null;
+
+  return {
+    upper: [{ value: upper, timestamp : price.timestamp }],
+    middle: [{ value: middle.value, timestamp : price.timestamp }],
+    lower: [{ value: lower, timestamp : price.timestamp }],
+  };
+  }
+
   reset(): void {}
 }
