@@ -12,7 +12,7 @@ export class RSI {
   }
 
   private hasEnoughData(data: OHLCV[]): boolean {
-    return data.length >= this.period + 1;
+    return data.length > this.period;
   }
 
   private calculateGainLoss(data: OHLCV[]): { avgGain: number; avgLoss: number } {

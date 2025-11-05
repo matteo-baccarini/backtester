@@ -18,6 +18,12 @@ export interface MACDResult {
   histogram: IndicatorResult[];
 }
 
+export interface BollingerBandsResult {
+  upper : IndicatorResult[];
+  middle : IndicatorResult[];
+  lower : IndicatorResult[];
+}
+
 export interface MACDValue {
   macd: number | null;
   signal : number | null;
