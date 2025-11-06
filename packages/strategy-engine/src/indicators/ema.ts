@@ -58,8 +58,12 @@ export class EMA {
   // Streaming update - stateful
   update(price: OHLCV): IndicatorResult | null {
     // If not initialized, collect prices for initial SMA
+    let closePrice = price.close;
+
     if (!this.initialized) {
-      this.prices.push(price.close);
+
+      this.sum += closePrice;
+      this.prices.push(closePrice);
 
       // Need exactly 'period' prices to initialize
       if (this.prices.length < this.period) {
@@ -67,8 +71,7 @@ export class EMA {
       }
 
       // Calculate initial SMA
-      const sum = this.prices.reduce((acc, cur) => acc + cur, 0);
-      this.previousEMA = sum / this.period;
+      this.previousEMA = this.sum / this.period;
       this.initialized = true;
       this.prices = []; // Clear the array, we don't need it anymore
       return {
@@ -79,7 +82,7 @@ export class EMA {
 
     // After initialization, just apply EMA formula
     // No need to maintain a sliding window
-    const closePrice = price.close;
+    closePrice = price.close;
     this.previousEMA = (closePrice - this.previousEMA!) * this.multiplier + this.previousEMA!;
     return {
       value: this.previousEMA,
@@ -92,5 +95,6 @@ export class EMA {
     this.prices = [];
     this.previousEMA = null;
     this.initialized = false;
+    this.sum = 0;
   }
 }
