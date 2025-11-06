@@ -6,6 +6,7 @@ export class EMA {
   private period: number;
   private prices: number[] = []; // Only store close prices, not full OHLCV
   private initialized: boolean = false;
+  private sum = 0;
 
   constructor(period: number = 20) {
     this.period = period;

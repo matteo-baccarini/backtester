@@ -3,6 +3,7 @@ import { IndicatorResult, OHLCV } from "./types";
 export class SMA {
   private period: number;
   private prices: number[] = []; // Store only close prices
+  private sum: number = 0; // Running sum for O(1) updates
 
   constructor(period: number = 20) {
     this.period = period;
@@ -46,13 +47,18 @@ export class SMA {
     return sum / this.period;
   }
 
-  // Incrementally update SMA with a new price
+  // Incrementally update SMA with a new price - O(1) complexity
   update(price: OHLCV): IndicatorResult | null {
-    this.prices.push(price.close); // Only store close price
+    const closePrice = price.close;
+    
+    // Add new price to running sum
+    this.sum += closePrice;
+    this.prices.push(closePrice);
 
-    // Maintain rolling window
+    // Maintain rolling window - remove oldest price from sum
     if (this.prices.length > this.period) {
-      this.prices.shift();
+      const oldPrice = this.prices.shift()!;
+      this.sum -= oldPrice;
     }
 
     // Only compute once enough data exists
@@ -60,9 +66,8 @@ export class SMA {
       return null;
     }
 
-    const sum = this.prices.reduce((acc, cur) => acc + cur, 0);
     return {
-      value: sum / this.period,
+      value: this.sum / this.period,
       timestamp: price.timestamp,
     };
   }
@@ -70,5 +75,6 @@ export class SMA {
   // Reset internal state
   reset(): void {
     this.prices = [];
+    this.sum = 0;
   }
 }
