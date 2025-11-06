@@ -1,8 +1,14 @@
+import {Position, Trade} from './types'
+
 export class Portfolio {
-  private totalCapital : number;
+  private availableCash : number;
+
+  private totalAssets : Map<string, Position> = new Map<string, Position>();
+
+  tradeHistory : Trade[] = [];
 
   constructor(initialCapital: number) {
-    this.totalCapital = initialCapital;
+    this.availableCash = initialCapital;
   }
   
   getValue(): number {
