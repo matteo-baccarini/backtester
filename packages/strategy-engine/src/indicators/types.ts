@@ -19,9 +19,9 @@ export interface MACDResult {
 }
 
 export interface BollingerBandsResult {
-  upper : IndicatorResult[] | null;
-  middle : IndicatorResult[] | null;
-  lower : IndicatorResult[] | null;
+  upper : IndicatorResult[];
+  middle : IndicatorResult[];
+  lower : IndicatorResult[];
 }
 
 export interface MACDValue {

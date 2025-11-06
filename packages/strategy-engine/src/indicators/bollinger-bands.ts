@@ -6,7 +6,11 @@ export class BollingerBands {
   private period : number;
   private multiplier : number;
   private smaIndicator : SMA;
-  prices : OHLCV[] = [];
+  private prices : OHLCV[] = [];
+  
+  // Running statistics for O(1) updates
+  private sum: number = 0;
+  private sumSquares: number = 0;
 
   constructor(period: number = 20, multiplier: number = 2) {
     this.period = period;
@@ -30,7 +34,7 @@ export class BollingerBands {
       sum += price;
       sumSquares += price * price;
 
-      // Once we exceed the window, subtract the price that’s sliding out
+      // Once we exceed the window, subtract the price that's sliding out
       if (i >= this.period) {
         const old = data[i - this.period].close;
         sum -= old;
@@ -67,11 +71,19 @@ export class BollingerBands {
   }
 
   update(price: OHLCV): BollingerBandsValue {
+    const closePrice = price.close;
+    
+    // Add new price to running totals
+    this.sum += closePrice;
+    this.sumSquares += closePrice * closePrice;
+    
     this.prices.push(price);
 
-    // Maintain rolling window
-    if (this.prices.length > this.period + 1) {
-      this.prices.shift();
+    // Maintain rolling window - remove oldest price from running totals
+    if (this.prices.length > this.period) {
+      const oldPrice = this.prices.shift()!;
+      this.sum -= oldPrice.close;
+      this.sumSquares -= oldPrice.close * oldPrice.close;
     }
 
     // Only compute once enough data exists
@@ -79,29 +91,24 @@ export class BollingerBands {
       return { upper : null, middle :null, lower : null };
     }
 
-    const stdDev = this.calculateStandardDeviation(this.prices);
+    // O(1) calculation of mean and std dev
+    const mean = this.sum / this.period;
+    const variance = (this.sumSquares / this.period) - (mean * mean);
+    const stdDev = Math.sqrt(Math.max(variance, 0));
 
-    const middle = this.smaIndicator.update(price);
-
-    
-  // If middle is null, we can’t compute the bands yet
-  if (!middle) {
-    return { upper: null, middle: null, lower: null };
-  }
-
-
-  const upper = middle.value !== null ? middle.value + this.multiplier * stdDev[stdDev.length -1] : null;
-  const lower = middle.value !== null ? middle.value - this.multiplier * stdDev[stdDev.length -1] : null;
-
-  return {
-    upper: upper,
-    middle: middle.value,
-    lower: lower,
-  };
+    return {
+      upper: mean + this.multiplier * stdDev,
+      middle: mean,
+      lower: mean - this.multiplier * stdDev,
+    };
   }
 
   reset(): void {
     this.prices = [];
+    this.sum = 0;
+    this.sumSquares = 0;
     this.smaIndicator.reset();
   }
+
+  getPrices(): OHLCV[] { return this.prices;}
 }
