@@ -1,5 +1,10 @@
 export class Portfolio {
-  constructor(initialCapital: number) {}
+  private totalCapital : number;
+
+  constructor(initialCapital: number) {
+    this.totalCapital = initialCapital;
+  }
+  
   getValue(): number {
     return 0;
   }
