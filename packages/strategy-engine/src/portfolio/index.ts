@@ -50,7 +50,6 @@ export class Portfolio {
         symbol : symbol,
         numberOfShares : quantity,
         averagePricePerShare : price,
-        positionSize : quantity * price,
         positionType : 'LONG',
       }
 
@@ -60,7 +59,6 @@ export class Portfolio {
       const totalCost = existingPosition.averagePricePerShare * existingPosition.numberOfShares + price * quantity;
       existingPosition.numberOfShares = totalShares;
       existingPosition.averagePricePerShare = totalCost/totalShares;
-      existingPosition.positionSize = totalShares * existingPosition.averagePricePerShare;
 
       this.totalAssets.set(symbol, existingPosition);
     }
@@ -68,7 +66,7 @@ export class Portfolio {
     this.availableCash -= quantity * price;
 
     const newTrade : Trade = {
-      symbol : symbol,
+      symbol,
       numberOfShares : quantity,
       pricePerShare : price,
       tradeType : 'BUY',  
@@ -79,7 +77,7 @@ export class Portfolio {
 
     return true;
   }
-  
+
   removePosition(symbol: string, quantity: number, price: number): boolean {
     return false;
   }

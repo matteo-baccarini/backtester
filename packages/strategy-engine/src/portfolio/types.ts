@@ -2,7 +2,6 @@ export type Position = {
     symbol : string;
     numberOfShares : number;
     averagePricePerShare : number;
-    positionSize : number;
     positionType : 'LONG' | 'SHORT';
 }
 
