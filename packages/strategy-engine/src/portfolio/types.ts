@@ -4,8 +4,6 @@ export type Position = {
     averagePricePerShare : number;
     positionSize : number;
     positionType : 'LONG' | 'SHORT';
-    marketValue : number;
-    //portfoliValue : number;
 }
 
 export type Trade = {
