@@ -14,12 +14,18 @@ export class Portfolio {
   getValue(): number {
     return 0;
   }
-  getPositions(): any[] {
-    return [];
+  getPosition(stock : string) : Position | null  {
+      return this.totalAssets.get(stock) ?? null;
   }
+
+  getPositions() : Map<string, Position> {
+    return new Map(this.totalAssets);
+  }
+
   getCash(): number {
-    return 0;
+    return this.availableCash;
   }
+  
   addPosition(symbol: string, quantity: number, price: number): boolean {
     return false;
   }
