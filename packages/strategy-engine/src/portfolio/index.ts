@@ -13,7 +13,15 @@ export class Portfolio {
     this.initialCapital = initialCapital;
   }
   
-  getValue(): number {
+  getValue(currentPrices : Map<string, number>): number {
+    ///current prices are obtained through API call to trading platform
+
+    let totalValue : number = 0;
+
+    for (let i = 0; i < this.totalAssets.size; i++){
+      
+    }
+
     return 0;
   }
   getPosition(stock : string) : Position | null  {
