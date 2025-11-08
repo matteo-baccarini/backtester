@@ -91,10 +91,38 @@ export class Portfolio {
       return false;
     }
 
-    if (this.totalAssets.has(symbol) === false){
+    const existingPosition = this.totalAssets.get(symbol);
+
+    if (!existingPosition){
       return false;
     }
-    return false;
+
+    if (existingPosition.numberOfShares < quantity) {
+      return false;
+    }
+
+    this.tradeHistory.push({
+      symbol,
+      numberOfShares : quantity,
+      pricePerShare : price,
+      tradeType : 'SELL',
+      tradeDate : new Date(),
+    })
+
+    if (existingPosition.numberOfShares === quantity) {
+      this.totalAssets.delete(symbol);
+    }else {
+      existingPosition.numberOfShares -= quantity;
+      this.totalAssets.set(symbol, existingPosition);
+    }
+
+    this.availableCash += quantity * price;
+    return true;
   }
-  reset(): void {}
+
+  reset(): void {
+    this.availableCash = 0;
+    this.totalAssets.clear();
+    this.tradeHistory = [];
+  }
 }
