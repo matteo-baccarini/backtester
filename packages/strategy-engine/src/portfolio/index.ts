@@ -1,6 +1,7 @@
 import {Position, Trade} from './types'
 
 export class Portfolio {
+  private initialCapital : number;
   private availableCash : number;
 
   private totalAssets : Map<string, Position> = new Map<string, Position>();
@@ -9,6 +10,7 @@ export class Portfolio {
 
   constructor(initialCapital: number) {
     this.availableCash = initialCapital;
+    this.initialCapital = initialCapital;
   }
   
   getValue(): number {
@@ -121,7 +123,7 @@ export class Portfolio {
   }
 
   reset(): void {
-    this.availableCash = 0;
+    this.availableCash = this.initialCapital;
     this.totalAssets.clear();
     this.tradeHistory = [];
   }
