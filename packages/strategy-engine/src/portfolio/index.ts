@@ -79,6 +79,21 @@ export class Portfolio {
   }
 
   removePosition(symbol: string, quantity: number, price: number): boolean {
+    ///step 1: validate inputs (assert user holds stock, negative quantity, empty stock string, negative price)
+    ///step 2: check if there is enough shares to sell
+    ///step 3: update or remove position from total assets (remove if none left, update if partially sold)
+    ///Average price per share remains unchanges on sale
+    ///step 4: update cash
+    ///step 5: record new entry in trade history
+    ///step 6: return success/failure boolean
+
+    if (quantity <= 0 || price <= 0 || symbol.trim() === '') {
+      return false;
+    }
+
+    if (this.totalAssets.has(symbol) === false){
+      return false;
+    }
     return false;
   }
   reset(): void {}
