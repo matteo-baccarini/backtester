@@ -374,14 +374,15 @@ describe('Portfolio', () => {
 
   describe('trade history', () => {
     it('should record all trades in order', () => {
-      const portfolio = new Portfolio(10000);
+      const portfolio = new Portfolio(20000);
       portfolio.addPosition('AAPL', 10, 100);
-      portfolio.addPosition('GOOGL', 5, 2000);
+      portfolio.addPosition('GOOGL', 5, 1000);
       portfolio.removePosition('AAPL', 5, 150);
       
-      expect(portfolio.tradeHistory.length).toBe(2);
+      expect(portfolio.tradeHistory.length).toBe(3);
       expect(portfolio.tradeHistory[0].symbol).toBe('AAPL');
-      expect(portfolio.tradeHistory[1].symbol).toBe('AAPL');
+      expect(portfolio.tradeHistory[1].symbol).toBe('GOOGL');
+      expect(portfolio.tradeHistory[2].symbol).toBe('AAPL');
     });
 
     it('should maintain trade data integrity', () => {
@@ -471,6 +472,235 @@ describe('Portfolio', () => {
       const result = portfolio.addPosition('AAPL  ', 10, 100);
       expect(result).toBe(true);
       expect(portfolio.getPosition('AAPL  ')?.symbol).toBe('AAPL  ');
+    });
+  });
+
+  describe('getValue()', () => {
+    it('should return only cash when no positions', () => {
+      const portfolio = new Portfolio(10000);
+      const currentPrices = new Map<string, number>();
+      expect(portfolio.getValue(currentPrices)).toBe(10000);
+    });
+
+    it('should calculate total portfolio value with single position', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100); // Spent 1000, have 9000 cash
+      
+      const currentPrices = new Map<string, number>();
+      currentPrices.set('AAPL', 150); // Position now worth 1500
+      
+      expect(portfolio.getValue(currentPrices)).toBe(10500); // 9000 cash + 1500 position
+    });
+
+    it('should calculate total portfolio value with multiple positions', () => {
+      const portfolio = new Portfolio(20000);
+      portfolio.addPosition('AAPL', 10, 100); // 1000 spent
+      portfolio.addPosition('GOOGL', 5, 1000); // 5000 spent
+      portfolio.addPosition('MSFT', 20, 300); // 6000 spent
+      // Remaining cash: 8000
+      
+      const currentPrices = new Map<string, number>();
+      currentPrices.set('AAPL', 150);  // 1500
+      currentPrices.set('GOOGL', 1200); // 6000
+      currentPrices.set('MSFT', 350);   // 7000
+      
+      expect(portfolio.getValue(currentPrices)).toBe(22500); // 8000 + 1500 + 6000 + 7000
+    });
+
+    it('should handle positions with profit', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      
+      const currentPrices = new Map<string, number>();
+      currentPrices.set('AAPL', 200);
+      
+      expect(portfolio.getValue(currentPrices)).toBe(11000); // 9000 cash + 2000 position
+    });
+
+    it('should handle positions with loss', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      
+      const currentPrices = new Map<string, number>();
+      currentPrices.set('AAPL', 50);
+      
+      expect(portfolio.getValue(currentPrices)).toBe(9500); // 9000 cash + 500 position
+    });
+
+    it('should handle missing price data gracefully', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      portfolio.addPosition('GOOGL', 5, 1000);
+      
+      const currentPrices = new Map<string, number>();
+      currentPrices.set('AAPL', 150); // Only AAPL price available
+      
+      // Should either skip GOOGL or handle it appropriately
+      // This test depends on your implementation choice
+      const value = portfolio.getValue(currentPrices);
+      expect(value).toBeGreaterThanOrEqual(4000); // At least cash remaining
+    });
+
+    it('should update value after trades', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      
+      const prices1 = new Map<string, number>();
+      prices1.set('AAPL', 150);
+      expect(portfolio.getValue(prices1)).toBe(10500);
+      
+      portfolio.removePosition('AAPL', 5, 150);
+      
+      const prices2 = new Map<string, number>();
+      prices2.set('AAPL', 150);
+      expect(portfolio.getValue(prices2)).toBe(10500); // 9750 cash + 750 position
+    });
+
+    it('should handle decimal current prices', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      
+      const currentPrices = new Map<string, number>();
+      currentPrices.set('AAPL', 123.45);
+      
+      expect(portfolio.getValue(currentPrices)).toBeCloseTo(10234.50, 2);
+    });
+  });
+
+  describe('getPositionProfitLoss()', () => {
+    it('should return null for non-existent position', () => {
+      const portfolio = new Portfolio(10000);
+      expect(portfolio.getPositionProfitLoss('AAPL', 150)).toBeNull();
+    });
+
+    it('should calculate profit correctly', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100); // Cost: 1000
+      
+      const profitLoss = portfolio.getPositionProfitLoss('AAPL', 150);
+      expect(profitLoss).toBe(500); // (10 * 150) - (10 * 100) = 500
+    });
+
+    it('should calculate loss correctly', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100); // Cost: 1000
+      
+      const profitLoss = portfolio.getPositionProfitLoss('AAPL', 80);
+      expect(profitLoss).toBe(-200); // (10 * 80) - (10 * 100) = -200
+    });
+
+    it('should return zero for breakeven', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      
+      const profitLoss = portfolio.getPositionProfitLoss('AAPL', 100);
+      expect(profitLoss).toBe(0);
+    });
+
+    it('should calculate profit/loss after averaging', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100); // avg: 100
+      portfolio.addPosition('AAPL', 10, 120); // avg: 110
+      
+      const profitLoss = portfolio.getPositionProfitLoss('AAPL', 150);
+      expect(profitLoss).toBe(800); // (20 * 150) - (20 * 110) = 800
+    });
+
+    it('should calculate profit/loss after partial sell', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 20, 100); // avg: 100
+      portfolio.removePosition('AAPL', 10, 150); // Still 10 shares at avg 100
+      
+      const profitLoss = portfolio.getPositionProfitLoss('AAPL', 130);
+      expect(profitLoss).toBe(300); // (10 * 130) - (10 * 100) = 300
+    });
+
+    it('should handle decimal prices', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 99.50);
+      
+      const profitLoss = portfolio.getPositionProfitLoss('AAPL', 105.75);
+      expect(profitLoss).toBeCloseTo(62.50, 2);
+    });
+
+    it('should handle large positions', () => {
+      const portfolio = new Portfolio(1000000);
+      portfolio.addPosition('AAPL', 10000, 50);
+      
+      const profitLoss = portfolio.getPositionProfitLoss('AAPL', 75);
+      expect(profitLoss).toBe(250000); // 25 profit per share * 10000 shares
+    });
+
+    it('should validate negative current price', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      
+      // Depending on your implementation, this might return null or handle differently
+      const profitLoss = portfolio.getPositionProfitLoss('AAPL', -50);
+      // This test assumes you validate currentPrice
+      expect(profitLoss).toBeNull();
+    });
+
+    it('should validate zero current price', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      
+      const profitLoss = portfolio.getPositionProfitLoss('AAPL', 0);
+      // This test assumes you validate currentPrice
+      expect(profitLoss).toBeNull();
+    });
+  });
+
+  describe('reset()', () => {
+    it('should clear all positions', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      portfolio.addPosition('GOOGL', 5, 1000);
+      
+      portfolio.reset();
+      expect(portfolio.getPositions().size).toBe(0);
+    });
+
+    it('should clear trade history', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      portfolio.removePosition('AAPL', 5, 150);
+      
+      portfolio.reset();
+      expect(portfolio.tradeHistory.length).toBe(0);
+    });
+
+    it('should reset cash to initial capital', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      
+      portfolio.reset();
+      // Note: This test assumes reset() sets cash back to initialCapital
+      // If your implementation sets it to 0, adjust this test
+      expect(portfolio.getCash()).toBe(10000);
+    });
+
+    it('should allow trading after reset', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      portfolio.reset();
+      
+      const result = portfolio.addPosition('GOOGL', 5, 1000);
+      expect(result).toBe(true);
+      expect(portfolio.getPosition('GOOGL')).not.toBeNull();
+    });
+
+    it('should be idempotent', () => {
+      const portfolio = new Portfolio(10000);
+      portfolio.addPosition('AAPL', 10, 100);
+      
+      portfolio.reset();
+      portfolio.reset();
+      portfolio.reset();
+      
+      expect(portfolio.getPositions().size).toBe(0);
+      expect(portfolio.tradeHistory.length).toBe(0);
+      expect(portfolio.getCash()).toBe(10000);
     });
   });
 });
