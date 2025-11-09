@@ -13,6 +13,16 @@ export class Portfolio {
     this.initialCapital = initialCapital;
   }
   
+  getPositionProfitLoss(symbol : string, currentPrice : number) : number | null {
+    const currentStock = this.totalAssets.get(symbol);
+
+    if (!currentStock){
+      return null;
+    }
+
+    return currentStock.numberOfShares * currentPrice - currentStock.numberOfShares * currentStock.averagePricePerShare;
+  }
+  
   getValue(currentPrices : Map<string, number>): number {
     ///current prices are obtained through API call to trading platform
 
