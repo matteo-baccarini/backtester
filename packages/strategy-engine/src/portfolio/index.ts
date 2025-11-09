@@ -18,12 +18,16 @@ export class Portfolio {
 
     let totalValue : number = 0;
 
-    for (let i = 0; i < this.totalAssets.size; i++){
-      
+    for (const [key, value] of this.totalAssets){
+      if (currentPrices === undefined){
+        continue;
+      }
+      totalValue += value.numberOfShares * currentPrices.get(key)!;
     }
 
-    return 0;
+    return totalValue + this.availableCash;
   }
+
   getPosition(stock : string) : Position | null  {
       return this.totalAssets.get(stock) ?? null;
   }
