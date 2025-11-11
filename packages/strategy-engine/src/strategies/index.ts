@@ -1,12 +1,12 @@
 import { OHLCV } from "../indicators";
 import { Portfolio } from "../portfolio";
 
-interface IsStragey {
+export interface IsStrategy {
   onBar(bar : OHLCV, portfolio : Portfolio) : Signal;
   reset() : void;
 }
 
-type Signal = {
+export type Signal = {
   action : 'BUY' | 'SELL' | 'HOLD';
   symbol : string;
   confidence : number;
