@@ -1,19 +1,9 @@
-export class BaseStrategy {
-  initialize(data?: any[]): void {}
-  update(data: any): void {}
-  generateSignals(): any[] {
-    return [];
-  }
-  reset(): void {}
-}
+import { OHLCV } from "../indicators";
+import { Portfolio } from "../portfolio";
 
-export class MovingAverageStrategy extends BaseStrategy {
-  constructor(fastPeriod: number = 20, slowPeriod: number = 50) {
-    super();
-  }
-  generateSignals(): any[] {
-    return [];
-  }
+interface IsStragey {
+  onBar(bar : OHLCV, portfolio : Portfolio) : Signal;
+  reset() : void;
 }
 
 type Signal = {
