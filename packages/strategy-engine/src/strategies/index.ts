@@ -15,3 +15,11 @@ export class MovingAverageStrategy extends BaseStrategy {
     return [];
   }
 }
+
+type Signal = {
+  action : 'BUY' | 'SELL' | 'HOLD';
+  symbol : string;
+  confidence : number;
+  reason : string;
+  timestamp : Date;
+}
