@@ -65,4 +65,9 @@ export class BacktestEngine {
 
     this.portfolio.removePosition(this.symbol, position.numberOfShares, priceData.close);
   }
+
+
+  private getEquityHistory(){
+    return this.equityHistory;
+  }
 }
