@@ -1,14 +1,3 @@
-// export class BacktestEngine {
-//   constructor(initialCapital: number) {}
-//   run(strategy: any, data: any[]): any {
-//     return {};
-//   }
-//   getResults(): any {
-//     return {};
-//   }
-//   reset(): void {}
-// }
-
 import { OHLCV } from "../indicators";
 import { Portfolio } from "../portfolio";
 import { IsStrategy, Signal } from "../strategies";
@@ -31,32 +20,8 @@ export class BacktestEngine {
     for (let i : number = 0; i < this.historicalData.length; i++){
       const priceData : OHLCV = this.historicalData[i];
       const strategySignal : Signal = this.strategyInstance.onBar(priceData, this.portfolio);
-      let quantity : number;
 
-      if (strategySignal.action === 'HOLD'){
-        continue;
-      } else if (strategySignal.action === 'BUY'){
-
-        const availableCash = this.portfolio.getCash();
-
-        if (availableCash === 0){
-          console.log("Insufficient Cash");
-          continue;
-        }
-        quantity = Math.floor((availableCash * this.allocation * strategySignal.confidence) / priceData.close);
-        this.portfolio.addPosition(this.symbol, quantity, priceData.close);
-
-        ///what should I do if purchase ends up not going through (different causes that can lead to this)
-
-      }else {
-        ///how much should i sell if signal comes out to be SELL? for now I will totally exit the position
-        const position = this.portfolio.getPosition(this.symbol);
-        if (!position) {
-          continue; // Can't sell what we don't have
-        }
-
-        this.portfolio.removePosition(this.symbol, position.numberOfShares, priceData.close);
-      }
+      this.executeSignal(strategySignal, priceData);
     }
   }
 
