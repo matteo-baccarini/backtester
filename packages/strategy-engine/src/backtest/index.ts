@@ -29,17 +29,22 @@ export class BacktestEngine {
 
   runEngine() {
     for (let i : number = 0; i < this.historicalData.length; i++){
-      const option : OHLCV = this.historicalData[i];
-      const order : Signal = this.strategyInstance.onBar(option, this.portfolio);
-      let purchaseResult : boolean;
+      const priceData : OHLCV = this.historicalData[i];
+      const strategySignal : Signal = this.strategyInstance.onBar(priceData, this.portfolio);
       let quantity : number;
 
-      if (order.action === 'HOLD'){
+      if (strategySignal.action === 'HOLD'){
         continue;
-      } else if (order.action === 'BUY'){
+      } else if (strategySignal.action === 'BUY'){
 
-        quantity = Math.floor((this.portfolio.getCash() * this.allocation * order.confidence) / option.close);
-        purchaseResult = this.portfolio.addPosition(this.symbol, quantity, option.close);
+        const availableCash = this.portfolio.getCash();
+
+        if (availableCash === 0){
+          console.log("Insufficient Cash");
+          continue;
+        }
+        quantity = Math.floor((availableCash * this.allocation * strategySignal.confidence) / priceData.close);
+        this.portfolio.addPosition(this.symbol, quantity, priceData.close);
 
         ///what should I do if purchase ends up not going through (different causes that can lead to this)
 
@@ -49,7 +54,8 @@ export class BacktestEngine {
         if (!position) {
           continue; // Can't sell what we don't have
         }
-        purchaseResult = this.portfolio.removePosition(this.symbol, position.numberOfShares, option.close);
+
+        this.portfolio.removePosition(this.symbol, position.numberOfShares, priceData.close);
       }
     }
   }
