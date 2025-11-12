@@ -8,6 +8,7 @@ export class BacktestEngine {
   private historicalData : OHLCV[];
   private symbol : string;
   private allocation : number = 0.2;
+  private equityHistory: { date: Date; equity: number }[] = [];
 
   constructor(symbol : string, inputCash : number, strategy : IsStrategy, historicalData : OHLCV[]) {
     this.historicalData = historicalData;
@@ -22,6 +23,11 @@ export class BacktestEngine {
       const strategySignal : Signal = this.strategyInstance.onBar(priceData, this.portfolio);
 
       this.executeSignal(strategySignal, priceData);
+
+      const priceMap = new Map<string, number>([[this.symbol, priceData.close]]);
+      const equity = this.portfolio.getValue(priceMap);
+
+      this.equityHistory.push({ date: priceData.timestamp, equity });
     }
   }
 
