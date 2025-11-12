@@ -59,4 +59,39 @@ export class BacktestEngine {
       }
     }
   }
+
+  private executeSignal(signal : Signal, priceData : OHLCV) : void{
+    if (signal.action === 'HOLD'){
+      return;
+    }
+
+    if (signal.action === 'BUY'){
+      this.executeBuy(signal, priceData);
+    }
+
+    if (signal.action === 'SELL'){
+      this.executeSell(signal, priceData);
+    }
+  }
+
+  private executeBuy(signal : Signal, priceData : OHLCV) : void {
+    const availableCash = this.portfolio.getCash();
+    if (availableCash < priceData.close){
+      console.log("Not available cash");
+      return;
+    }
+    const quantity = Math.floor((availableCash * this.allocation * signal.confidence)/priceData.close);
+    this.portfolio.addPosition(this.symbol, quantity, priceData.close);
+  }
+
+  private executeSell(signal : Signal, priceData : OHLCV) : void {
+    const position = this.portfolio.getPosition(this.symbol);
+
+    if (!position){
+      console.log("Stock not in assets");
+      return;
+    }
+
+    this.portfolio.removePosition(this.symbol, position.numberOfShares, priceData.close);
+  }
 }
