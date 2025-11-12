@@ -67,7 +67,16 @@ export class BacktestEngine {
   }
 
 
-  private getEquityHistory(){
+  getEquityHistory(){
     return this.equityHistory;
+  }
+
+  getFinalReturn() : number {
+    if (this.equityHistory.length === 0) return 0;
+
+    const initial = this.equityHistory[0].equity;
+    const final = this.equityHistory[this.equityHistory.length - 1].equity;
+
+    return (final-initial) / initial;
   }
 }
