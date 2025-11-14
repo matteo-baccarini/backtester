@@ -18,6 +18,10 @@ export class BacktestEngine {
   }
 
   runEngine() {
+    this.portfolio.reset();
+    this.strategyInstance.reset();
+    this.equityHistory = [];
+
     for (let i : number = 0; i < this.historicalData.length; i++){
       const priceData : OHLCV = this.historicalData[i];
       const strategySignal : Signal = this.strategyInstance.onBar(priceData, this.portfolio);
@@ -47,11 +51,11 @@ export class BacktestEngine {
 
   private executeBuy(signal : Signal, priceData : OHLCV) : void {
     const availableCash = this.portfolio.getCash();
-    if (availableCash < priceData.close){
-      console.log("Not available cash");
-      return;
-    }
     const quantity = Math.floor((availableCash * this.allocation * signal.confidence)/priceData.close);
+
+    if (quantity <= 0) {
+      return; // Not enough to buy even 1 share
+    }
     this.portfolio.addPosition(this.symbol, quantity, priceData.close);
   }
 
