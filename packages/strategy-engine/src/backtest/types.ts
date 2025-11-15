@@ -14,6 +14,6 @@ export interface BacktestResult {
     losingTrades : number;
     winRate : number;
     maxDrawdown : number;
-    maxDrawDownPercent : number;
+    maxDrawdownPercent : number;
     sharpeRatio : number;
 }
