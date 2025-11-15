@@ -145,4 +145,40 @@ export class BacktestEngine {
 
     return {maxDrawdown, maxDrawdownPercentage};
   }
+
+
+  private calculateSharpeRatio() : number {
+    if (this.equityHistory.length < 2){
+      return 0;
+    }
+
+    const returns : number[] = [];
+
+    for (let i = 1; i < this.equityHistory.length; i++){
+      const previousEquity = this.equityHistory[i - 1].equity;
+      const currentEquity = this.equityHistory[i].equity;
+
+      if (previousEquity > 0){
+        const dailyReturn = (currentEquity - previousEquity) / previousEquity;
+        returns.push(dailyReturn);
+      }
+    }
+
+    if (returns.length === 0) {
+      return 0;
+    }
+
+    const avgReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length;
+
+    const squaredDiffs = returns.map(r => Math.pow(r - avgReturn, 2));
+    const variance = squaredDiffs.reduce((sum, sq) => sum + sq, 0) / returns.length;
+    const stdDev = Math.sqrt(variance);
+
+    if (stdDev === 0) {
+      return 0;
+    }
+
+    const sharpeRatio = avgReturn / stdDev;
+    return sharpeRatio * Math.sqrt(252);
+  }
 }
