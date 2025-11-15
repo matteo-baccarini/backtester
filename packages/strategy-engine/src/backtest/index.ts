@@ -119,4 +119,30 @@ export class BacktestEngine {
 
     return {wins, losses};
   }
+
+
+  private calculateMaxDrawdown() : { maxDrawdown : number; maxDrawdownPercentage : number}{
+    if (this.equityHistory.length === 0){
+      return { maxDrawdown : 0, maxDrawdownPercentage : 0};
+    }
+
+    let peak = this.equityHistory[0].equity;
+    let maxDrawdown = 0;
+
+    for (const point of this.equityHistory){
+      if (point.equity > peak){
+        peak = point.equity;
+      }
+
+      const drawdown = peak - point.equity;
+
+      if(drawdown > maxDrawdown){
+        maxDrawdown = drawdown;
+      }
+    }
+
+    const maxDrawdownPercentage = peak > 0 ? (maxDrawdown / peak) * 100 : 0;
+
+    return {maxDrawdown, maxDrawdownPercentage};
+  }
 }
