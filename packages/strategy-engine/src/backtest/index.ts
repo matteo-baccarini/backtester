@@ -1,6 +1,9 @@
+export * from "./types"
+
 import { OHLCV } from "../indicators";
 import { Portfolio } from "../portfolio";
 import { IsStrategy, Signal } from "../strategies";
+import { EquityPoint, backtestResult } from "./types";
 
 export class BacktestEngine {
   private portfolio : Portfolio;
@@ -8,7 +11,7 @@ export class BacktestEngine {
   private historicalData : OHLCV[];
   private symbol : string;
   private allocation : number = 0.2;
-  private equityHistory: { date: Date; equity: number }[] = [];
+  private equityHistory: EquityPoint[] = [];
 
   constructor(symbol : string, inputCash : number, strategy : IsStrategy, historicalData : OHLCV[]) {
     this.historicalData = historicalData;
@@ -71,7 +74,7 @@ export class BacktestEngine {
   }
 
 
-  getEquityHistory(){
+  getEquityHistory() : EquityPoint[] {
     return this.equityHistory;
   }
 
@@ -83,4 +86,8 @@ export class BacktestEngine {
 
     return (final-initial) / initial;
   }
+
+  // calculateWinLoss() : {wins : number, losses : number} {
+
+  // }
 }
