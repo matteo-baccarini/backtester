@@ -87,7 +87,36 @@ export class BacktestEngine {
     return (final-initial) / initial;
   }
 
-  // calculateWinLoss() : {wins : number, losses : number} {
+  calculateWinLoss() : {wins : number, losses : number} {
+    let wins = 0;
+    let losses = 0;
+    
+    const sellTrades = this.portfolio.tradeHistory.filter(t => t.tradeType === 'SELL');
 
-  // }
+    for (const sellTrade of sellTrades) {
+
+      const buyTrades = this.portfolio.tradeHistory.filter(
+        t => t.symbol === sellTrade.symbol &&
+        t.tradeType === 'BUY' &&
+        t.tradeDate < sellTrade.tradeDate
+      );
+
+      if (buyTrades.length > 0){
+        const totalCost = buyTrades.reduce((sum, t) =>
+        sum + (t.pricePerShare * t.numberOfShares), 0);
+
+        const totalShares = buyTrades.reduce((sum, t) => sum + t.numberOfShares, 0);
+
+        const avgBuyPrice = totalCost/totalShares;
+
+        if (sellTrade.pricePerShare > avgBuyPrice){
+          wins ++;
+        }else if (sellTrade.pricePerShare < avgBuyPrice){
+          losses++;
+        }
+      }
+    }
+
+    return {wins, losses};
+  }
 }
