@@ -3,17 +3,17 @@ export interface EquityPoint {
     equity : number;
 }
 
-export interface backtestResult {
+export interface BacktestResult {
     initialCapital : number;
     finalValue : number;
     totalReturn : number;
-    totalReturnPercentage : number;
+    totalReturnPercent : number;
     equityCurve : EquityPoint[];
     trades : number;
     winningTrades : number;
     losingTrades : number;
     winRate : number;
     maxDrawdown : number;
-    maxDrawDownPercentage : number;
+    maxDrawDownPercent : number;
     sharpeRatio : number;
 }

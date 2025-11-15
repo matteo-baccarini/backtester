@@ -3,7 +3,7 @@ export * from "./types"
 import { OHLCV } from "../indicators";
 import { Portfolio } from "../portfolio";
 import { IsStrategy, Signal } from "../strategies";
-import { EquityPoint, backtestResult } from "./types";
+import { EquityPoint, BacktestResult } from "./types";
 
 export class BacktestEngine {
   private portfolio : Portfolio;
@@ -121,9 +121,9 @@ export class BacktestEngine {
   }
 
 
-  private calculateMaxDrawdown() : { maxDrawdown : number; maxDrawdownPercentage : number}{
+  private calculateMaxDrawdown() : { maxDrawdown : number; maxDrawdownPercent : number}{
     if (this.equityHistory.length === 0){
-      return { maxDrawdown : 0, maxDrawdownPercentage : 0};
+      return { maxDrawdown : 0, maxDrawdownPercent : 0};
     }
 
     let peak = this.equityHistory[0].equity;
@@ -141,9 +141,9 @@ export class BacktestEngine {
       }
     }
 
-    const maxDrawdownPercentage = peak > 0 ? (maxDrawdown / peak) * 100 : 0;
+    const maxDrawdownPercent = peak > 0 ? (maxDrawdown / peak) * 100 : 0;
 
-    return {maxDrawdown, maxDrawdownPercentage};
+    return {maxDrawdown, maxDrawdownPercent};
   }
 
 
@@ -180,5 +180,51 @@ export class BacktestEngine {
 
     const sharpeRatio = avgReturn / stdDev;
     return sharpeRatio * Math.sqrt(252);
+  }
+
+    getResults(): BacktestResult {
+    if (this.equityHistory.length === 0) {
+      return {
+        initialCapital: 0,
+        finalValue: 0,
+        totalReturn: 0,
+        totalReturnPercent: 0,
+        equityCurve: [],
+        trades: 0,
+        winningTrades: 0,
+        losingTrades: 0,
+        winRate: 0,
+        maxDrawdown: 0,
+        maxDrawdownPercent: 0,
+        sharpeRatio: 0
+      };
+    }
+
+    const initial = this.equityHistory[0].equity;
+    const final = this.equityHistory[this.equityHistory.length - 1].equity;
+    const totalReturn = final - initial;
+    const totalReturnPercent = (totalReturn / initial) * 100;
+
+    const { wins, losses } = this.calculateWinLoss();
+    const totalTrades = this.portfolio.tradeHistory.filter(t => t.tradeType === 'SELL').length;
+    const winRate = totalTrades > 0 ? (wins / totalTrades) * 100 : 0;
+
+    const { maxDrawdown, maxDrawdownPercent } = this.calculateMaxDrawdown();
+    const sharpeRatio = this.calculateSharpeRatio();
+
+    return {
+      initialCapital: initial,
+      finalValue: final,
+      totalReturn,
+      totalReturnPercent,
+      equityCurve: this.equityHistory,
+      trades: this.portfolio.tradeHistory.length,
+      winningTrades: wins,
+      losingTrades: losses,
+      winRate,
+      maxDrawdown,
+      maxDrawdownPercent,
+      sharpeRatio
+    };
   }
 }
