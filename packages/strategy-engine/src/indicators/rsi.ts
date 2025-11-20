@@ -5,7 +5,9 @@ export class RSI {
   private avgGain: number | null = null;
   private avgLoss: number | null = null;
   private previousClose: number | null = null;
-  private prices: number[] = [];
+  private warmUpCount: number = 0;
+  private warmUpGainSum: number = 0;
+  private warmUpLossSum: number = 0;
 
   constructor(period: number = 14) {
     this.period = period;
@@ -58,7 +60,7 @@ export class RSI {
       timestamp: data[this.period].timestamp
     });
 
-    // Wilder’s smoothing
+    // Wilder's smoothing
     for (let i = this.period + 1; i < data.length; i++) {
       const change = data[i].close - data[i - 1].close;
       const gain = change > 0 ? change : 0;
@@ -77,45 +79,48 @@ export class RSI {
   }
 
   update(data: OHLCV): IndicatorResult | null {
-    this.prices.push(data.close);
-
-    if (this.prices.length < this.period + 1) {
+    // First bar: just store the close
+    if (this.previousClose === null) {
       this.previousClose = data.close;
       return null;
     }
 
-    // Initialize averages
-    if (this.avgGain === null || this.avgLoss === null) {
-      let gains = 0;
-      let losses = 0;
-      for (let i = 1; i < this.period + 1; i++) {
-        const change = this.prices[i] - this.prices[i - 1];
-        if (change > 0) gains += change;
-        else losses += Math.abs(change);
-      }
+    // Calculate change from previous close
+    const change = data.close - this.previousClose;
+    const gain = Math.max(change, 0);
+    const loss = Math.max(-change, 0);
 
-      this.avgGain = gains / this.period;
-      this.avgLoss = losses / this.period;
+    // Warm-up phase: we need 'period' changes to calculate first RSI
+    // warmUpCount tracks how many changes we've accumulated
+    if (this.warmUpCount < this.period) {
+      this.warmUpGainSum += gain;
+      this.warmUpLossSum += loss;
+      this.warmUpCount++;
       this.previousClose = data.close;
 
+      // Still warming up
+      if (this.warmUpCount < this.period) {
+        return null;
+      }
+
+      // We now have exactly 'period' changes, calculate first averages
+      this.avgGain = this.warmUpGainSum / this.period;
+      this.avgLoss = this.warmUpLossSum / this.period;
+
       return {
-        value : this.calculateRSI(this.avgGain, this.avgLoss),
-        timestamp : data.timestamp
+        value: this.calculateRSI(this.avgGain, this.avgLoss),
+        timestamp: data.timestamp
       };
     }
 
-    // Wilder smoothing
-    const change = data.close - (this.previousClose ?? data.close);
-    const gain = change > 0 ? change : 0;
-    const loss = change < 0 ? Math.abs(change) : 0;
-
-    this.avgGain = (this.avgGain * (this.period - 1) + gain) / this.period;
-    this.avgLoss = (this.avgLoss * (this.period - 1) + loss) / this.period;
+    // After warm-up: Wilder's smoothing
+    this.avgGain = (this.avgGain! * (this.period - 1) + gain) / this.period;
+    this.avgLoss = (this.avgLoss! * (this.period - 1) + loss) / this.period;
     this.previousClose = data.close;
 
     return {
-      value : this.calculateRSI(this.avgGain, this.avgLoss),
-      timestamp : data.timestamp
+      value: this.calculateRSI(this.avgGain, this.avgLoss),
+      timestamp: data.timestamp
     };
   }
 
@@ -128,6 +133,8 @@ export class RSI {
     this.avgGain = null;
     this.avgLoss = null;
     this.previousClose = null;
-    this.prices = [];
+    this.warmUpCount = 0;
+    this.warmUpGainSum = 0;
+    this.warmUpLossSum = 0;
   }
 }
