@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // User model - Stores user accounts
@@ -15,36 +14,76 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String
+  password  String   // Will store hashed password
   role      String   @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   strategies Strategy[]
+  backtests  Backtest[]
 }
 
 // Strategy model - Stores trading strategies
 model Strategy {
   id          String   @id @default(cuid())
   name        String
-  description String
-  rules       Json
+  description String?
+  
+  // Strategy-specific parameters (for SMACrossoverStrategy)
+  symbol      String
+  shortPeriod Int
+  longPeriod  Int
+  
   userId      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user      User       @relation(fields: [userId], references: [id])
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   backtests Backtest[]
+  
+  @@index([userId])
 }
 
 // Backtest model - Stores backtest results
 model Backtest {
   id             String   @id @default(cuid())
   strategyId     String
+  userId         String
+  symbol         String
   startDate      DateTime
   endDate        DateTime
   initialCapital Float
-  results        Json
-  createdAt      DateTime @default(now())
+  
+  // Backtest results - matching your BacktestResult type
+  finalValue         Float
+  totalReturn        Float
+  totalReturnPercent Float
+  trades             Int
+  winningTrades      Int
+  losingTrades       Int
+  winRate            Float
+  maxDrawdown        Float
+  maxDrawdownPercent Float
+  sharpeRatio        Float
+  
+  createdAt DateTime @default(now())
 
-  strategy Strategy @relation(fields: [strategyId], references: [id])
+  strategy    Strategy      @relation(fields: [strategyId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  equityCurve EquityPoint[]
+  
+  @@index([userId])
+  @@index([strategyId])
+}
+
+// EquityPoint model - Stores equity curve data points
+model EquityPoint {
+  id         String   @id @default(cuid())
+  backtestId String
+  date       DateTime
+  equity     Float
+
+  backtest Backtest @relation(fields: [backtestId], references: [id], onDelete: Cascade)
+  
+  @@index([backtestId])
 }
