@@ -22,7 +22,9 @@ export class StrategiesService {
         symbol: strategyData.symbol,
         shortPeriod: strategyData.shortPeriod,
         longPeriod: strategyData.longPeriod,
-        userId: userId,
+        user: {
+          connect: { id: userId },
+        },
       },
     });
 
