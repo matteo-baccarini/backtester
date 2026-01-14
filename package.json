@@ -31,6 +31,7 @@
     "pnpm": ">=8.0.0"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "dotenv": "^17.2.3"
   }
 }
