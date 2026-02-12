@@ -1,8 +1,7 @@
-import 'dotenv/config';
+require('dotenv/config');
 
-export default {
+module.exports = {
 	datasource: {
 		url: process.env.DATABASE_URL,
 	},
 };
-
