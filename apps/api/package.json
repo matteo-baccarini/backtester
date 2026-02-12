@@ -11,6 +11,7 @@
     "@nestjs/passport": "^10.0.2",
     "@nestjs/platform-express": "^11.1.8",
     "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.0.0",
     "bcryptjs": "^2.4.3",
     "bullmq": "^5.62.1",
     "ioredis": "^5.8.2",
@@ -21,7 +22,6 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.9",
-    "@prisma/client": "^7.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/passport-jwt": "^3.0.13",
     "eslint-plugin-prettier": "^5.5.4",
@@ -29,7 +29,8 @@
     "prisma": "^7.0.0"
   },
   "scripts": {
-    "build": "nest build",
+    "build": "prisma generate && nest build",
+    "postinstall": "prisma generate",
     "start": "nest start",
     "start:dev": "nest start --watch"
   }
