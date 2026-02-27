@@ -7,6 +7,9 @@
 ![NestJS](https://img.shields.io/badge/NestJS-10.0-red)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+> [!WARNING]
+> **Work In Progress:** This project is currently under active development. Features and documentation may be incomplete or subject to change.
+
 ## Project Description
 
 **What it does:**
@@ -17,8 +20,7 @@ This project is a modern, full-stack monorepo for algorithmic trading strategy b
 - **NestJS:** Provides a scalable, robust, and strongly-typed backend architecture.
 - **React & Vite:** Ensures a blazing-fast user interface and development experience.
 - **Prisma & PostgreSQL:** Offers a reliable, type-safe database layer to store complex user data, backtest results, and strategies.
-- **Redis & BullMQ:** Manages the heavy lifting and asynchronous nature of backtesting through robust background job queues.
-- **Tailwind / CSS:** For modern and responsive visual components (assuming typical companion to Vite/React).
+- **Redis & BullMQ:** Redis is an in-memory data store that, paired with BullMQ, manages the heavy lifting and asynchronous nature of backtesting through robust background job queues.
 
 **Future features:**
 - Live trading execution via exchange APIs.
