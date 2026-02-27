@@ -123,7 +123,7 @@ Please ensure that you run `pnpm lint`, `pnpm format:check`, and `pnpm test` bef
 
 ## Include Credits
 
-- Built by the [Your Team/Name] team.
+- Built by Matteo Baccarini.
 - Built utilizing [NestJS](https://nestjs.com/), [React](https://react.dev/), [Vite](https://vitejs.dev/), and [Prisma](https://www.prisma.io/).
 
 ## Add a License
