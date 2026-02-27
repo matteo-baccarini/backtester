@@ -10,7 +10,7 @@
 ## Project Description
 
 **What it does:**
-This project is a modern, full-stack monorepo for algorithmic cryptocurrency and stock trading strategy backtesting and paper trading. It provides a comprehensive platform to build, backtest, and visualize trading strategies using real historical data and technical indicators. 
+This project is a modern, full-stack monorepo for algorithmic trading strategy backtesting and paper trading. It provides a comprehensive platform to build, backtest, and visualize trading strategies using real historical data and technical indicators. 
 
 **Why we used these technologies:**
 - **Turborepo & pnpm:** To efficiently manage a monorepo structure, sharing types and core logic securely between the frontend and backend.
