@@ -59,18 +59,17 @@ export class BacktestEngine {
     if (quantity <= 0) {
       return; // Not enough to buy even 1 share
     }
-    this.portfolio.addPosition(this.symbol, quantity, priceData.close);
+    this.portfolio.addPosition(this.symbol, quantity, priceData.close, priceData.timestamp);
   }
 
   private executeSell(signal : Signal, priceData : OHLCV) : void {
     const position = this.portfolio.getPosition(this.symbol);
 
     if (!position){
-      console.log("Stock not in assets");
       return;
     }
 
-    this.portfolio.removePosition(this.symbol, position.numberOfShares, priceData.close);
+    this.portfolio.removePosition(this.symbol, position.numberOfShares, priceData.close, priceData.timestamp);
   }
 
 

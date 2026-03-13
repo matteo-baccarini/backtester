@@ -2,14 +2,17 @@ import { OHLCV } from "../indicators";
 import { Portfolio } from "../portfolio";
 
 export interface IsStrategy {
-  onBar(bar : OHLCV, portfolio : Portfolio) : Signal;
-  reset() : void;
+  onBar(bar: OHLCV, portfolio: Portfolio): Signal;
+  reset(): void;
 }
 
 export type Signal = {
-  action : 'BUY' | 'SELL' | 'HOLD';
-  symbol : string;
-  confidence : number;
-  reason : string;
-  timestamp : Date;
+  action: 'BUY' | 'SELL' | 'HOLD';
+  symbol: string;
+  confidence: number;
+  reason: string;
+  timestamp: Date;
 }
+
+export * from "./SMACrossoverStrategy";
+export * from "./RSIMeanReversionStrategy";

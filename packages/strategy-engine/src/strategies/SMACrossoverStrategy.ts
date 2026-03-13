@@ -54,7 +54,7 @@ export class SMACrossoverStrategy implements IsStrategy {
                 signal = {
                     action: 'BUY',
                     symbol: this.symbol,
-                    confidence: Math.min(Math.abs(currentShort - currentLong) / currentLong, 1.0),
+                    confidence: 1.0,
                     reason: `SMA(${this.shortPeriod}) crossed above SMA(${this.longPeriod})`,
                     timestamp: price.timestamp,
                 };
@@ -68,7 +68,7 @@ export class SMACrossoverStrategy implements IsStrategy {
                 signal = {
                     action: 'SELL',
                     symbol: this.symbol,
-                    confidence: Math.min(Math.abs(currentLong - currentShort) / currentLong, 1.0),
+                    confidence: 1.0,
                     reason: `SMA(${this.shortPeriod}) crossed below SMA(${this.longPeriod})`,
                     timestamp: price.timestamp,
                 };
@@ -79,7 +79,7 @@ export class SMACrossoverStrategy implements IsStrategy {
                 signal = {
                     action: 'BUY',
                     symbol: this.symbol,
-                    confidence: Math.min(Math.abs(shortValue.value! - longValue.value!) / longValue.value!, 1.0),
+                    confidence: 1.0,
                     reason: `Initial signal: SMA(${this.shortPeriod}) above SMA(${this.longPeriod})`,
                     timestamp: price.timestamp,
                 };

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,52 +6,42 @@ datasource db {
   provider = "postgresql"
 }
 
-// User model - Stores user accounts
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  password  String   // Will store hashed password
-  role      String   @default("user")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  strategies Strategy[]
+  id         String     @id @default(cuid())
+  email      String     @unique
+  name       String
+  password   String
+  role       String     @default("user")
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
   backtests  Backtest[]
+  strategies Strategy[]
 }
 
-// Strategy model - Stores trading strategies
 model Strategy {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   name        String
   description String?
-
-  // Strategy-specific parameters (for SMACrossoverStrategy)
   symbol      String
   shortPeriod Int
   longPeriod  Int
-
   userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  backtests Backtest[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  backtests   Backtest[]
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
-// Backtest model - Stores backtest results
 model Backtest {
-  id             String   @id @default(cuid())
-  strategyId     String
-  userId         String
-  symbol         String
-  startDate      DateTime
-  endDate        DateTime
-  initialCapital Float
-
-  // Backtest results - matching your BacktestResult type
+  id                 String        @id @default(cuid())
+  strategyId         String
+  userId             String
+  symbol             String
+  startDate          DateTime
+  endDate            DateTime
+  initialCapital     Float
   finalValue         Float
   totalReturn        Float
   totalReturnPercent Float
@@ -65,25 +52,21 @@ model Backtest {
   maxDrawdown        Float
   maxDrawdownPercent Float
   sharpeRatio        Float
-
-  createdAt DateTime @default(now())
-
-  strategy    Strategy      @relation(fields: [strategyId], references: [id], onDelete: Cascade)
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  equityCurve EquityPoint[]
+  createdAt          DateTime      @default(now())
+  strategy           Strategy      @relation(fields: [strategyId], references: [id], onDelete: Cascade)
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  equityCurve        EquityPoint[]
 
   @@index([userId])
   @@index([strategyId])
 }
 
-// EquityPoint model - Stores equity curve data points
 model EquityPoint {
   id         String   @id @default(cuid())
   backtestId String
   date       DateTime
   equity     Float
-
-  backtest Backtest @relation(fields: [backtestId], references: [id], onDelete: Cascade)
+  backtest   Backtest @relation(fields: [backtestId], references: [id], onDelete: Cascade)
 
   @@index([backtestId])
 }

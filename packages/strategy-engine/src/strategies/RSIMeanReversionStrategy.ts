@@ -1,6 +1,6 @@
 import {IndicatorResult, IsStrategy, RSI, OHLCV, Portfolio, Signal } from '../index';
 
-export class RSIStrategy implements IsStrategy {
+export class RSIMeanReversionStrategy implements IsStrategy {
     private RSI : RSI;
     private symbol : string;
     private oversoldThreshold : number;

@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { BacktestsService } from './backtests.service';
+import { BacktestsController } from './backtests.controller';
+import { StrategiesModule } from '../strategies/strategies.module';
 
 /**
  * BacktestsModule
@@ -12,11 +14,14 @@ import { BacktestsService } from './backtests.service';
  */
 @Module({
   // Other modules this module depends on
-  imports: [PrismaModule],
+  imports: [PrismaModule,
+    StrategiesModule,
+  ],
+  controllers: [BacktestsController],
   // Classes Nest can instantiate within this module
   providers: [BacktestsService],
   // What this module exposes so other modules can inject it
   exports: [BacktestsService],
 })
-export class BacktestsModule {}
+export class BacktestsModule { }
 
