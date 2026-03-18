@@ -1,21 +1,27 @@
-// import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-const queryClient = new QueryClient();
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from './assets/vite.svg'
+import heroImg from './assets/hero.png'
+import Navbar from './Navbar'
+import './App.css'
+import Home from './pages/home'
+import Strategies from './pages/strategies'
+import Backtests from './pages/backtests'
+import { Route, Routes } from 'react-router-dom'
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+    <>
+      <Navbar />
+      <div className="Container">
         <Routes>
-          <Route path="/" element={<div>Dashboard</div>} />
-          <Route path="/strategies" element={<div>Strategies</div>} />
-          <Route path="/backtests" element={<div>Backtests</div>} />
+          <Route path="/" element={<Home />} />
+          <Route path="/strategies" element={<Strategies />} />
+          <Route path="/backtests" element={<Backtests />} />
         </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
+      </div>
+    </>
+  )
 }
 
-export default App;
+export default App
